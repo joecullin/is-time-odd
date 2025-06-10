@@ -2,11 +2,12 @@ format:
 	gofmt -w *.go
 
 clean:
-	rm -rf bin/* buildtmp/* ummmm/*
+	rm -rf bin/* buildtmp/* ummmm/* ../server/data/*
 	mkdir -p bin
 	mkdir -p buildtmp/even
 	mkdir -p buildtmp/odd
 	mkdir -p buildtmp/app
+	mkdir -p ../server/data
 
 build:
 	make clean
@@ -27,6 +28,12 @@ build:
 	GOOS=linux GOARCH=amd64 go build -o bin/app_odd_linux buildtmp/odd/*.go
 	GOOS=windows GOARCH=amd64 go build -o bin/app_odd.exe buildtmp/odd/*.go
 
+	# copy odd & even builds to server's data dir:
+	cp bin/* ../server/data
+
+	# update server's appData.json file:
+	node ../utils/generateDataFile.js
+
 	# build "un-initialized" versions of app:
 	cp *.go buildtmp/app
 	perl -pi -e 's/PLACEHOLDER_VERSION_STRING/1.0/g' buildtmp/app/*.go
@@ -34,7 +41,5 @@ build:
 	GOOS=darwin GOARCH=amd64 go build -o bin/is_time_odd_mac buildtmp/app/*.go
 	GOOS=linux GOARCH=amd64 go build -o bin/is_time_odd_linux buildtmp/app/*.go
 	GOOS=windows GOARCH=amd64 go build -o bin/is_time_odd.exe buildtmp/app/*.go
-
-	#TODO (after progress on server) - copy builds to server dir, create json file for server
 
 	@echo

@@ -36,7 +36,7 @@ func getRelease(os, version string) (ReleaseData, error) {
 		}
 		return false
 	})
-	if i > 0 {
+	if i != -1 {
 		return appData.Releases[i], nil
 	} else {
 		return ReleaseData{}, errors.New("no matching releases found")
