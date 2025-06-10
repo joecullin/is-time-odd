@@ -1,0 +1,36 @@
+# Most of this is from https://github.com/github/gitignore.
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+buildtmp/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Code coverage profiles and other test artifacts
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+
+# Editor/IDE
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# ignore data files in my downloads app
+download/files/
+*.bak
