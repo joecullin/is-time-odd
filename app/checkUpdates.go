@@ -41,8 +41,20 @@ func checkForUpdates() {
 		log.Println("Error downloading new release!", err)
 		return
 	}
+
+	//TODO: check downloaded app:
+	// - compare md5 checksum
+	// - size checks (not tiny)
+	// - run with "--test" flag, then inspect output and exitcode
+
+	err = copyFile(newFilePath, selfPath)
+	if err != nil {
+		log.Println("Error copying downloaded version over ourselves!", err)
+		return
+	}
+
 	log.Println("Restarting app...")
-	// increase chances of above log message getting flushed to stdout before we go away
+	// Filler, to increase odds of log messages getting flushed to stdout before we go away.
 	for range 5 {
 		log.Println(".")
 	}
@@ -127,4 +139,64 @@ func restartApp() error {
 		}
 	}
 	return nil //TODO - it's an error if we reach this, right?
+}
+
+func copyFile(sourceFilePath, destinationFilePath string) error {
+	log.Printf("Copying %s to %s.\n", sourceFilePath, destinationFilePath)
+
+	// Windows fails with "Access Denied" if we overwrite our the currently running exe.
+	// But it lets us do the replacement in two steps:
+	//   1. Rename the in-use file to ".bak"
+	//   2. Copy the new file to the current exe.
+	// We can do the same on linux & mac for consistency. (Need to update permissions though.)
+	// It's nice to have the ".bak" file too, for manual troubleshooting and rollback.
+
+	// Detect old file's current permissions before we touch it.
+	var perms os.FileMode
+	perms = 0644
+	if runtime.GOOS != "windows" {
+		if fileInfo, err := os.Lstat(destinationFilePath); err != nil {
+			log.Printf("Can't get current permissions for dest file %s: %v\n", destinationFilePath, err)
+		} else {
+			perms = fileInfo.Mode().Perm()
+			log.Printf("Current permissions of dest file %s: %#o\n", destinationFilePath, perms)
+		}
+	}
+
+	backupPath := destinationFilePath + ".bak"
+	log.Printf("Backing up file %s to %s!\n", destinationFilePath, backupPath)
+	if err := os.Rename(destinationFilePath, backupPath); err != nil {
+		log.Printf("Can't back up file %s to %s!\n", destinationFilePath, backupPath)
+		return err
+	}
+
+	inputFile, err := os.Open(sourceFilePath)
+	if err != nil {
+		log.Printf("Can't open source file %s: %e\n", sourceFilePath, err)
+		return err
+	}
+	defer inputFile.Close()
+
+	outputFile, err := os.Create(destinationFilePath)
+	if err != nil {
+		log.Printf("Can't open destination file %s: %e\n", destinationFilePath, err)
+		return err
+	}
+	defer outputFile.Close()
+
+	n, err := io.Copy(outputFile, inputFile)
+	if err != nil {
+		log.Printf("Can't write destination file %s: %e\n", destinationFilePath, err)
+		return err
+	}
+	log.Printf("Copied %s to %s. wrote %d bytes.\n", sourceFilePath, destinationFilePath, n)
+
+	if runtime.GOOS != "windows" {
+		log.Printf("Restoring original permissions (%v) to file %s.\n", perms, destinationFilePath)
+		if err = os.Chmod(destinationFilePath, perms); err != nil {
+			log.Printf("Can't set permissions to %v on %s: %s\n", perms, destinationFilePath, err)
+		}
+	}
+
+	return nil
 }

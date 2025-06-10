@@ -6,6 +6,7 @@ clean:
 	mkdir -p bin
 	mkdir -p buildtmp/even
 	mkdir -p buildtmp/odd
+	mkdir -p buildtmp/app
 
 build:
 	make clean
@@ -25,6 +26,14 @@ build:
 	GOOS=darwin GOARCH=amd64 go build -o bin/app_odd_mac buildtmp/odd/*.go
 	GOOS=linux GOARCH=amd64 go build -o bin/app_odd_linux buildtmp/odd/*.go
 	GOOS=windows GOARCH=amd64 go build -o bin/app_odd.exe buildtmp/odd/*.go
+
+	# build "un-initialized" versions of app:
+	cp *.go buildtmp/app
+	perl -pi -e 's/PLACEHOLDER_VERSION_STRING/1.0/g' buildtmp/app/*.go
+	perl -pi -e 's/PLACEHOLDER_TIME_VALUE/UNCERTAIN/g' buildtmp/app/*.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/is_time_odd_mac buildtmp/app/*.go
+	GOOS=linux GOARCH=amd64 go build -o bin/is_time_odd_linux buildtmp/app/*.go
+	GOOS=windows GOARCH=amd64 go build -o bin/is_time_odd.exe buildtmp/app/*.go
 
 	#TODO (after progress on server) - copy builds to server dir, create json file for server
 
