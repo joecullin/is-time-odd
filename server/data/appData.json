@@ -1,0 +1,31 @@
+{
+    "releases": [
+        {
+            "version": "1.1",
+            "md5": "a074bae8c0f45d0340ff952b3acf22dc",
+            "tags": ["active"],
+            "platform": "linux",
+            "file": "a"
+        },
+        {
+            "version": "1.0",
+            "tags": ["active", "latest", "odd"],
+            "platform": "windows",
+            "md5": "a074bae8c0f45d0340ff952b3acf22dc",
+            "file": "a_odd.exe"
+        },
+        {
+            "version": "0.9",
+            "tags": ["archive", "even", "latest"],
+            "platform": "windows",
+            "file": "a_even.exe"
+        },
+        {
+            "version": "1.1",
+            "tags": ["active", "latest"],
+            "platform": "darwin",
+            "md5": "a074bae8c0f45d0340ff952b3acf22dc",
+            "file": "b"
+        }
+    ]
+}
