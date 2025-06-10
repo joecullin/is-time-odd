@@ -15,53 +15,28 @@ func router() {
 
 	router := http.NewServeMux()
 
+	// get release details
 	router.HandleFunc("GET /api/releases/{os}/{version}/info", func(w http.ResponseWriter, r *http.Request) {
-		osParam := r.PathValue("os")
-		versionParam := r.PathValue("version")
-		if matched, err := regexp.MatchString("^linux|darwin|windows$", osParam); err != nil || !matched {
-			fmt.Fprintf(w, "Validation failed for os=%s. Must be a supported os.\n", osParam)
-			return
-		}
-		if matched, err := regexp.MatchString("^([0-9]+[.][0-9]+)|latest$", versionParam); err != nil || !matched {
-			fmt.Fprintf(w, "Validation failed for version=%s. Must be x.x or 'latest'.\n", versionParam)
-			return
-		}
-		log.Printf("api/releases/.../info: ! os=%s version=%s\n", osParam, versionParam)
-		release, err := getRelease(osParam, versionParam)
+		release, err := validateAndGetRelease(r.PathValue("os"), r.PathValue("version"))
 		if err != nil {
-			log.Println("getRelease did not return a valid release:", err)
 			notFoundPage(w)
 			return
 		}
-		log.Printf("found %s for %s\n", release.Version, release.Platform)
-		jsonString, err := json.Marshal(release)
-		if err != nil {
-			log.Println("error:", err)
-		}
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, string(jsonString))
+		handleGetReleaseInfo(w, release)
 	})
 
-	router.HandleFunc("GET /api/releases/darwin/1.1", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("api/testdownload\n")
-
-		data, err := os.ReadFile("./server")
+	// download a release
+	router.HandleFunc("GET /api/releases/{os}/{version}", func(w http.ResponseWriter, r *http.Request) {
+		release, err := validateAndGetRelease(r.PathValue("os"), r.PathValue("version"))
 		if err != nil {
-			log.Printf("Error reading data file!")
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "Oh no! An error occurred on our end. Maybe try again later?")
+			notFoundPage(w)
 			return
 		}
-
-		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Header().Set("Content-Length", strconv.Itoa(len(data)))
-		w.WriteHeader(http.StatusOK)
-		w.Write(data)
+		handleDownloadRelease(w, release)
 	})
 
-	// homepage plus catch-all for all other paths and methods:
-	router.Handle("/", http.HandlerFunc(infoPage))
+	// homepage, plus catch-all 404 for any other method+path
+	router.Handle("/", http.HandlerFunc(apiInfoPage))
 
 	log.Println("listening on port", serverPort)
 	if err := http.ListenAndServe(":"+serverPort, router); err != nil {
@@ -69,18 +44,53 @@ func router() {
 	}
 }
 
-func notFoundPage(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, `
-        <html>
-        <head>Not found!</head>
-        <body>
-        Not found! See <a href="/">docs</a> for help.
-        </body>
-        </html>`)
+// shared by a couple routes with similar paths: validate path params, and get release.
+func validateAndGetRelease(osParam, versionParam string) (ReleaseData, error) {
+	var release ReleaseData
+	if matched, err := regexp.MatchString("^linux|darwin|windows$", osParam); err != nil || !matched {
+		return release, fmt.Errorf("Validation failed for os=%s. Must be a supported os.\n", osParam)
+	}
+	if matched, err := regexp.MatchString("^([0-9]+[.][0-9]+)|latest$", versionParam); err != nil || !matched {
+		return release, fmt.Errorf("Validation failed for version=%s. Must be x.x or 'latest'.\n", versionParam)
+	}
+	release, err := getRelease(osParam, versionParam)
+	if err != nil {
+		log.Println("validateAndGetRelease: getRelease did not return a valid release.", err)
+		return release, err
+	}
+	return release, nil
 }
 
-func infoPage(w http.ResponseWriter, req *http.Request) {
+func handleGetReleaseInfo(w http.ResponseWriter, release ReleaseData) {
+	log.Printf("sending release info: os=%s version=%s", release.Platform, release.Version)
+	jsonString, err := json.Marshal(release)
+	if err != nil {
+		log.Println("Error creating json of release info:", err)
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, string(jsonString))
+}
+
+func handleDownloadRelease(w http.ResponseWriter, release ReleaseData) {
+	log.Printf("api/testdownload\n")
+
+	appFilePath := getPathToExecutable(release)
+	appFileData, err := os.ReadFile(appFilePath)
+	if err != nil {
+		log.Printf("Error reading app file %s: %e", appFilePath, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, "Oh no! An error occurred on our end. Maybe try again later?")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Length", strconv.Itoa(len(appFileData)))
+	w.WriteHeader(http.StatusOK)
+	w.Write(appFileData)
+}
+
+func apiInfoPage(w http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		notFoundPage(w)
 		return
@@ -93,6 +103,17 @@ func infoPage(w http.ResponseWriter, req *http.Request) {
 			TODO: add some small "docs" here.
 			- maybe - link to github readme
 			- maybe - incorporate some dynamic data from request (in a template)
+        </body>
+        </html>`)
+}
+
+func notFoundPage(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, `
+        <html>
+        <head>Not found!</head>
+        <body>
+        Not found! See <a href="/">docs</a> for help.
         </body>
         </html>`)
 }

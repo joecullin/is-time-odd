@@ -43,6 +43,11 @@ func getRelease(os, version string) (ReleaseData, error) {
 	}
 }
 
+// tiny helper function, to keep file path details out of routes code
+func getPathToExecutable(release ReleaseData) string {
+	return filepath.Join(appDataPath, release.File)
+}
+
 // Read json file with details about all releases
 func loadAppData() {
 	dataFilePath := filepath.Join(appDataPath, "appData.json")
