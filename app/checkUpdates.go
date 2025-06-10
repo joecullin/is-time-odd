@@ -54,7 +54,7 @@ func checkForUpdates() {
 	}
 
 	log.Println("Restarting app...")
-	// Filler, to increase odds of log messages getting flushed to stdout before we go away.
+	// Filler, to increase odds of meaningful messages getting flushed to stdout before we go away.
 	for range 5 {
 		log.Println(".")
 	}
@@ -138,7 +138,7 @@ func restartApp() error {
 			os.Exit(0)
 		}
 	}
-	return nil //TODO - it's an error if we reach this, right?
+	return nil
 }
 
 func copyFile(sourceFilePath, destinationFilePath string) error {
