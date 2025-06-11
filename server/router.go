@@ -8,14 +8,14 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"time"
+	// "time"
 )
 
-func testDelay(seconds int) {
-	log.Printf("sleeping %d seconds to test how client app handles delays", seconds)
-	time.Sleep(time.Duration(seconds) * time.Second)
-	log.Println("done sleeping")
-}
+// func testDelay(seconds int) {
+// 	log.Printf("sleeping %d seconds to test how client app handles delays", seconds)
+// 	time.Sleep(time.Duration(seconds) * time.Second)
+// 	log.Println("done sleeping")
+// }
 
 func router() {
 	log.Println("port is", serverPort)

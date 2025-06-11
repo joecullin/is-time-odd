@@ -32,9 +32,8 @@ func startupInit() error {
 	log.Printf("Starting server")
 
 	// Process command-line params
-	// serverPort = *flag.String("port", "80", "port to listen on")
-	flag.StringVar(&serverPort, "port", "80", "port to listen on")
-	flag.StringVar(&appDataPath, "app-data", "./data/appData.json", "data file")
+	flag.StringVar(&serverPort, "port", "3008", "port to listen on")
+	flag.StringVar(&appDataPath, "app-data", "./server_data", "data directory")
 	flag.Parse()
 
 	//TODO - stricter validation, like:

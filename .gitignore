@@ -7,9 +7,11 @@
 *.so
 *.dylib
 
+dist/
 bin/
 buildtmp/
 server/data/
+server/server_data/
 
 # Test binary, built with `go test -c`
 *.test

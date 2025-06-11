@@ -1,4 +1,4 @@
-// Quick and dirty utility to create the server/data/appData.json file.
+// Quick and dirty utility to create the server/server_data/appData.json file.
 //
 // 1. Start with a hardcoded file & tag list. (The same files from the build step in app/Makefile.)
 // 2. Look for the those files in the data dir, and compute the md5 of each.
@@ -10,7 +10,7 @@ const fs = require("fs");
 const child_process = require("child_process");
 const { release } = require("os");
 
-const dataDir = "../server/data"
+const dataDir = "../server/server_data"
 const appData = {
     "releases": [
         {
