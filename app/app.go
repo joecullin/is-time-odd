@@ -36,12 +36,12 @@ func main() {
 	}
 }
 
-// The supposed "core function" of the app, other than the self-updating part.
-// Display a line saying whether the current minute is odd or not.
+// The "core function" of the app, aside from its self-update ability.
+// Display a message saying whether the current minute is odd or not.
 func showOddTime() {
 	// A value like "odd" or "not odd" gets compiled into different versions of the app.
 	// (See Makefile.)
-	log.Println("Time is PLACEHOLDER_TIME_VALUE!")
+	log.Println("************ Time is PLACEHOLDER_TIME_VALUE! ************")
 }
 
 func startupInit() error {
