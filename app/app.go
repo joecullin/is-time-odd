@@ -22,13 +22,14 @@ func main() {
 	if selfTestMode {
 		showOddTime()
 		os.Exit(0)
+	} else {
+		go keepShowingOddTime()
 	}
 
-	// Print result and check for updates every second.
+	// Also check for updates every second.
 	ticker := time.Tick(1 * time.Second)
 	for range ticker {
 		log.Println("") // blank line space to separate chunks log lines
-		showOddTime()
 		checkForUpdates()
 	}
 }
@@ -38,7 +39,20 @@ func main() {
 func showOddTime() {
 	// A value like "odd" or "not odd" gets compiled into different versions of the app.
 	// (See Makefile.)
-	log.Println("************ Time is PLACEHOLDER_TIME_VALUE! ************")
+
+	// ANSI colors, to make this message stand out from all the update-checker log messages.
+	var Blue = "\033[34m"
+	var Reset = "\033[0m"
+	log.Println(Blue + "************ Time is PLACEHOLDER_TIME_VALUE! ************" + Reset)
+}
+
+// Keep showing odd time forever, once a second
+func keepShowingOddTime() {
+	ticker := time.Tick(1 * time.Second)
+	for range ticker {
+		time.Sleep(1 * time.Second)
+		showOddTime()
+	}
 }
 
 func startupInit() error {

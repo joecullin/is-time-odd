@@ -23,14 +23,14 @@ type Release struct {
 }
 
 func checkForUpdates() {
-	log.Printf("This is version %s for %s.\n", currentVersion, runtime.GOOS)
+	log.Printf("--- This is version %s for %s.\n", currentVersion, runtime.GOOS)
 
 	latest, err := getReleaseInfo("latest")
 	if err != nil {
 		log.Println("Error getting release info!", err)
 		return
 	}
-	log.Printf("Latest version=%v, md5=%s\n", latest.Version, latest.Md5)
+	log.Printf("--- Latest version=%v\n", latest.Version)
 	if latest.Version == currentVersion {
 		// We're up to date! Nothing more to do.
 		return
@@ -61,7 +61,7 @@ func checkForUpdates() {
 func getReleaseInfo(version string) (Release, error) {
 	var releaseInfo Release
 	infoUrl := fmt.Sprintf("%s/api/releases/%s/%s/info", serverUrl, runtime.GOOS, version)
-	log.Println("Checking for updates at", infoUrl)
+	log.Println("--- Checking for updates at", infoUrl)
 
 	res, err := http.Get(infoUrl)
 	if err != nil {

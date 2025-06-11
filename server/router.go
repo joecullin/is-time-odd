@@ -8,7 +8,14 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 )
+
+func testDelay(seconds int) {
+	log.Printf("sleeping %d seconds to test how client app handles delays", seconds)
+	time.Sleep(time.Duration(seconds) * time.Second)
+	log.Println("done sleeping")
+}
 
 func router() {
 	log.Println("port is", serverPort)
@@ -22,6 +29,8 @@ func router() {
 			notFoundPage(w)
 			return
 		}
+		// Un-comment to manually verify that client app still prints the time when update check is slow:
+		// testDelay(15)
 		handleGetReleaseInfo(w, release)
 	})
 
