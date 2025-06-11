@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"fmt"
 	"io"
 	"log"
@@ -54,10 +55,6 @@ func checkForUpdates() {
 	}
 
 	log.Println("Restarting app...")
-	// Filler, to increase odds of meaningful messages getting flushed to stdout before we go away.
-	for range 5 {
-		log.Println(".")
-	}
 	restartApp()
 }
 
@@ -110,16 +107,18 @@ func downloadRelease(filePath string, release Release) error {
 }
 
 func restartApp() error {
-
-	restartParams := []string{`--server="http://localhost:5005"`} //TODO - get these from argv
+	restartParams := os.Args[1:] // re-use same params that we were invoked with.
 
 	if runtime.GOOS != "windows" {
 		// Exec is nicer when it's available.
 		// (Replaces current process, so things like job control in shell still work.)
-		params := append([]string{"_"}, restartParams...)
+		filename := filepath.Base(os.Args[0])
+		params := append([]string{filename}, restartParams...)
 		env := os.Environ()
+		log.Printf("Re-starting %s as %s with params %v\n", selfPath, filename, params)
+		flushLog()
 		if err := syscall.Exec(selfPath, params, env); err != nil {
-			log.Printf("Error re-starting %s with params %v: %e\n", selfPath, params, err)
+			log.Printf("Error re-starting %s as %s with params %v: %e\n", selfPath, filename, params, err)
 			return err
 		}
 		log.Println("done re-starting!")
@@ -135,10 +134,18 @@ func restartApp() error {
 			return err
 		} else {
 			log.Println("Started new process! Exiting this one")
+			flushLog()
 			os.Exit(0)
 		}
 	}
 	return nil
+}
+
+// Hack-ish way to make sure we don't lose interesting log messages on restart.
+func flushLog() {
+	for range 5 {
+		log.Println(".")
+	}
 }
 
 func copyFile(sourceFilePath, destinationFilePath string) error {
