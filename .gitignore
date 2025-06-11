@@ -7,7 +7,7 @@
 *.so
 *.dylib
 
-dist/
+# dist/
 bin/
 buildtmp/
 server/data/

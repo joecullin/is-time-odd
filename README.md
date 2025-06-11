@@ -13,17 +13,17 @@ Go has been on my learning wishlist for a while. This take-home would've been cl
 
 I wanted to keep the core of the app clear and non-distracting: any user can correlate the output against the log timestamps and intuitively know which version is supposed to be the latest.
 
-I wanted a built-in way to demo the auto-update mechanism, without any extra user action.
+I wanted a built-in way to demo the auto-update mechanism, without any extra user action required to trigger a new release.
 
 ## What is it?
 
 The core app, *is_time_odd*, produces a steady stream of console messages declaring whether the current minute is odd or not. For example: 11:15am has an odd minute (15), and 19:54 has an even minute (54).
 
-The app has an unusual architecture. Every version of the app has the "is odd" or "is even" message hardcoded.
+The app has a [Rube Goldberg machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine)-like architecture. Every version of the app has the "is odd" or "is even" message hardcoded.
 
 In order to remain (mostly) accurate, the app continually checks in with an update server to make sure it has the latest version.
 
-The update server tags a different "latest" version every minute, causing the app to download that new version and do an in-place upgrade of itself.
+Every minute, the update server tags a different release as the _latest_, which then causes the `is_time_odd` app to download that new version and do an in-place upgrade of itself.
 
 ## Quick start
 
