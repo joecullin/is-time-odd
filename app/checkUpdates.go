@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"path/filepath"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -141,9 +141,9 @@ func restartApp() error {
 	return nil
 }
 
-// Hack-ish way to make sure we don't lose interesting log messages on restart.
+// Log a few throwaway messages, to help flush the earlier messages before restart.
 func flushLog() {
-	for range 5 {
+	for range 3 {
 		log.Println(".")
 	}
 }

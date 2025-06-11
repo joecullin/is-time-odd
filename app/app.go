@@ -26,11 +26,8 @@ func main() {
 
 	// Print result and check for updates every second.
 	ticker := time.Tick(1 * time.Second)
-	counter := 0
 	for range ticker {
-		// We don't do anything with counter, other than log it to help show context.
-		counter++
-		log.Println(counter)
+		log.Println("") // blank line space to separate chunks log lines
 		showOddTime()
 		checkForUpdates()
 	}
