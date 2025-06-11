@@ -87,7 +87,13 @@ dist:
 	pushd buildtmp/dist/windows/server_data && rm *mac *linux && popd
 	pushd buildtmp/dist/linux/server_data && rm *mac *.exe && popd
 
-	# pushd buildtmp/dist/mac && find . -type f
+	# add a simple readme file
+	echo "Refer to https://github.com/joecullin/is-time-odd for more info about this app." > buildtmp/dist/README.md
+	cp buildtmp/dist/README.md buildtmp/dist/mac
+	cp buildtmp/dist/README.md buildtmp/dist/windows
+	cp buildtmp/dist/README.md buildtmp/dist/linux
+
+	# create a zip file for each dist
 	pushd buildtmp/dist/mac && zip -r ../../../../dist/ito_mac.zip * && popd
 	pushd buildtmp/dist/windows && zip -r ../../../../dist/ito_windows.zip * && popd
 	pushd buildtmp/dist/linux && zip -r ../../../../dist/ito_linux.zip * && popd

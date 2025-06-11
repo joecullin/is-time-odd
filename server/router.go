@@ -107,11 +107,13 @@ func apiInfoPage(w http.ResponseWriter, req *http.Request) {
 
 	fmt.Fprint(w, `
         <html>
-        <head>Releases Server</head>
+        <head>
+			<title>Releases Server for is-time-odd</title>
+		</head>
         <body>
-			TODO: add some small "docs" here.
-			- maybe - link to github readme
-			- maybe - incorporate some dynamic data from request (in a template)
+			This is the releases server for is-time-odd.
+			<p/>
+			See <a href="https://github.com/joecullin/is-time-odd">github.com/joecullin/is-time-odd</a> for docs and more info.
         </body>
         </html>`)
 }
@@ -120,7 +122,9 @@ func notFoundPage(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprint(w, `
         <html>
-        <head>Not found!</head>
+        <head>
+			<title>not found!</title>
+		</head>
         <body>
         Not found! See <a href="/">docs</a> for help.
         </body>
