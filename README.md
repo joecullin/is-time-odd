@@ -9,8 +9,6 @@ This is a take-home assignment for my current job search.
 
 Go has been on my learning wishlist for a while. This take-home would've been clunkier in an interpreted language like Javascript, so I took it as an opportunity to dive in and learn Go.
 
-(See [docs/journal.md](/docs/journal.md) for notes on that experience.)
-
 #### Why "is time odd"?
 
 I wanted to keep the core of the app clear and non-distracting: any user can correlate the output against the log timestamps and intuitively know which version is supposed to be the latest.
